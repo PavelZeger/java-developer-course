@@ -45,10 +45,16 @@ public class ObjectFactory {
         List<Field> annotatedFields = Arrays.stream(type.getDeclaredFields())
                 .filter(field -> field.isAnnotationPresent(InjectRandomInt.class))
                 .collect(Collectors.toUnmodifiableList());
-        annotatedFields.forEach(field -> {
-            field.setAccessible(true);
-            field.set(RandomUtil.getRandomInt());
-        });
+        for (Field field : annotatedFields) {
+            try {
+                field.setAccessible(true);
+                field.set(type, RandomUtil.getRandomInt(
+                        type.getAnnotation(InjectRandomInt.class).min(),
+                        type.getAnnotation(InjectRandomInt.class).max()));
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
         return type.getDeclaredConstructor().newInstance();
     }
 
