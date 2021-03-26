@@ -25,6 +25,11 @@ public class ObjectFactory {
     private ObjectFactory() {
         Reflections scanner = new Reflections("org.zeger.customspring");
         Set<Class<? extends ObjectConfigurator>> configuratorClasses = scanner.getSubTypesOf(ObjectConfigurator.class);
+        initConfigurators(configuratorClasses);
+    }
+
+    @SneakyThrows
+    private void initConfigurators(Set<Class<? extends ObjectConfigurator>> configuratorClasses) {
         for (Class<? extends ObjectConfigurator> configurator : configuratorClasses) {
             configurators.add(configurator.getDeclaredConstructor().newInstance());
         }
@@ -47,8 +52,12 @@ public class ObjectFactory {
     public <T> T createObject(Class<T> type) {
         type = getImplementation(type);
         T object = type.getDeclaredConstructor().newInstance();
-        configurators.forEach(configurator -> configurator.configure(object));
+        configure(object);
         return object;
+    }
+
+    private <T> void configure(T object) {
+        configurators.forEach(configurator -> configurator.configure(object));
     }
 
     private <T> Class<T> getImplementation(Class<T> type) {

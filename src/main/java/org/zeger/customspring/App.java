@@ -1,5 +1,7 @@
 package org.zeger.customspring;
 
+import org.zeger.customspring.factory.ObjectFactory;
+
 /**
  * @author Pavel Zeger
  * @implNote java-developer-course
@@ -8,7 +10,6 @@ package org.zeger.customspring;
 public class App {
 
     public static void main(String[] args) {
-        IRobot iRobot = new IRobot();
-        iRobot.cleanRoom();
+        ObjectFactory.getInstance().createObject(IRobot.class).cleanRoom();
     }
 }

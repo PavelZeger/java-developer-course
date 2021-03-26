@@ -1,7 +1,7 @@
 package org.zeger.customspring;
 
-import org.zeger.customspring.factory.ObjectFactory;
 import org.zeger.customspring.cleaner.Cleaner;
+import org.zeger.customspring.factory.annotation.InjectByType;
 import org.zeger.customspring.speaker.Speaker;
 
 /**
@@ -11,8 +11,15 @@ import org.zeger.customspring.speaker.Speaker;
  */
 public class IRobot {
 
-    private Speaker speaker = ObjectFactory.getInstance().createObject(Speaker.class);
-    private Cleaner cleaner = ObjectFactory.getInstance().createObject(Cleaner.class);
+    @InjectByType
+    private Speaker speaker;
+
+    @InjectByType
+    private Cleaner cleaner;
+
+    public void init() {
+
+    }
 
     public void cleanRoom() {
         speaker.speak("I've started...");
