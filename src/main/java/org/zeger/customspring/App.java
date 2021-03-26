@@ -11,8 +11,12 @@ import org.zeger.customspring.worker.Worker;
 public class App {
 
     public static void main(String[] args) {
-        ObjectFactory.getInstance().createObject(IRobot.class).cleanRoom();
-        ObjectFactory.getInstance().createObject(Worker.class).rest();
+        IRobot iRobot = ObjectFactory.getInstance().createObject(IRobot.class);
+        iRobot.cleanRoom();
+
+        Worker worker = ObjectFactory.getInstance().createObject(Worker.class);
+        worker.work();
+        worker.rest();
     }
 
 }

@@ -2,7 +2,7 @@ package org.zeger.customspring.factory.config;
 
 import org.zeger.customspring.cleaner.Cleaner;
 import org.zeger.customspring.cleaner.HouseCleaner;
-import org.zeger.customspring.speaker.PopUpSpeaker;
+import org.zeger.customspring.speaker.ConsoleSpeaker;
 import org.zeger.customspring.speaker.Speaker;
 
 import java.util.HashMap;
@@ -18,7 +18,7 @@ public class JavaConfig implements Config {
     private Map<Class, Class> interfaceToImplementation = new HashMap<>();
 
     public JavaConfig() {
-        interfaceToImplementation.put(Speaker.class, PopUpSpeaker.class);
+        interfaceToImplementation.put(Speaker.class, ConsoleSpeaker.class);
         interfaceToImplementation.put(Cleaner.class, HouseCleaner.class);
     }
 
