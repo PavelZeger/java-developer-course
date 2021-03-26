@@ -1,15 +1,14 @@
 package org.zeger.customspring.factory;
 
 import lombok.SneakyThrows;
-import org.zeger.customspring.factory.annotation.InjectRandomInt;
+import org.reflections.Reflections;
 import org.zeger.customspring.factory.config.Config;
 import org.zeger.customspring.factory.config.JavaConfig;
-import org.zeger.customspring.factory.util.RandomUtil;
+import org.zeger.customspring.factory.config.ObjectConfigurator;
 
-import java.lang.reflect.Field;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 /**
  * @author Pavel Zeger
@@ -18,10 +17,17 @@ import java.util.stream.Collectors;
  */
 public class ObjectFactory {
 
-    private static volatile ObjectFactory instance = new ObjectFactory();
-    private Config config = new JavaConfig();
+    private static ObjectFactory instance = new ObjectFactory();
+    private final Config config = new JavaConfig();
+    private final List<ObjectConfigurator> configurators = new ArrayList<>();
 
+    @SneakyThrows
     private ObjectFactory() {
+        Reflections scanner = new Reflections("org.zeger.customspring");
+        Set<Class<? extends ObjectConfigurator>> configuratorClasses = scanner.getSubTypesOf(ObjectConfigurator.class);
+        for (Class<? extends ObjectConfigurator> configurator : configuratorClasses) {
+            configurators.add(configurator.getDeclaredConstructor().newInstance());
+        }
     }
 
     public static ObjectFactory getInstance() {
@@ -39,23 +45,18 @@ public class ObjectFactory {
 
     @SneakyThrows
     public <T> T createObject(Class<T> type) {
+        type = getImplementation(type);
+        T object = type.getDeclaredConstructor().newInstance();
+        configurators.forEach(configurator -> configurator.configure(object));
+        return object;
+    }
+
+    private <T> Class<T> getImplementation(Class<T> type) {
         if (type.isInterface()) {
             type = config.getImplementation(type);
         }
-        List<Field> annotatedFields = Arrays.stream(type.getDeclaredFields())
-                .filter(field -> field.isAnnotationPresent(InjectRandomInt.class))
-                .collect(Collectors.toUnmodifiableList());
-        for (Field field : annotatedFields) {
-            try {
-                field.setAccessible(true);
-                field.set(type, RandomUtil.getRandomInt(
-                        type.getAnnotation(InjectRandomInt.class).min(),
-                        type.getAnnotation(InjectRandomInt.class).max()));
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
-        return type.getDeclaredConstructor().newInstance();
+        return type;
     }
+
 
 }
