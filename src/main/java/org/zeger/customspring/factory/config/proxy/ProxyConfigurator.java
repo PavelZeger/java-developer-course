@@ -7,6 +7,6 @@ package org.zeger.customspring.factory.config.proxy;
  */
 public interface ProxyConfigurator {
 
-    <T> Object wrapWithProxy(Object object, Class<T> type);
+    <T> Object wrapWithProxy(Class<T> type, Object object);
 
 }

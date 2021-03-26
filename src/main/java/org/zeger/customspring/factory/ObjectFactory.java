@@ -72,7 +72,7 @@ public class ObjectFactory {
 
     private <T> T wrapWithProxy(Class<T> type, T object) {
         for (ProxyConfigurator proxyConfigurator : proxyConfigurators) {
-            object = (T) proxyConfigurator.wrapWithProxy(object, type);
+            object = (T) proxyConfigurator.wrapWithProxy(type, object);
         }
         return object;
     }
