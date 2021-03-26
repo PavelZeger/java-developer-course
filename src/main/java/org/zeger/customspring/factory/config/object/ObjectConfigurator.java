@@ -1,4 +1,4 @@
-package org.zeger.customspring.factory.config;
+package org.zeger.customspring.factory.config.object;
 
 /**
  * @author Pavel Zeger

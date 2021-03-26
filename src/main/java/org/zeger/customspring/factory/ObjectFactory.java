@@ -3,9 +3,11 @@ package org.zeger.customspring.factory;
 import lombok.SneakyThrows;
 import org.reflections.ReflectionUtils;
 import org.reflections.Reflections;
+import org.zeger.customspring.exception.ImplementationException;
 import org.zeger.customspring.factory.config.Config;
 import org.zeger.customspring.factory.config.JavaConfig;
-import org.zeger.customspring.factory.config.ObjectConfigurator;
+import org.zeger.customspring.factory.config.object.ObjectConfigurator;
+import org.zeger.customspring.factory.config.proxy.ProxyConfigurator;
 
 import javax.annotation.PostConstruct;
 import java.lang.reflect.Method;
@@ -21,21 +23,27 @@ import java.util.stream.Collectors;
  */
 public class ObjectFactory {
 
+    private final Reflections scanner = new Reflections("org.zeger.customspring");
     private static ObjectFactory instance = new ObjectFactory();
     private final Config config = new JavaConfig();
-    private final List<ObjectConfigurator> configurators = new ArrayList<>();
+    private final List<ObjectConfigurator> objectConfigurators = new ArrayList<>();
+    private final List<ProxyConfigurator> proxyConfigurators = new ArrayList<>();
 
     @SneakyThrows
     private ObjectFactory() {
-        Reflections scanner = new Reflections("org.zeger.customspring");
         Set<Class<? extends ObjectConfigurator>> configuratorClasses = scanner.getSubTypesOf(ObjectConfigurator.class);
-        initConfigurators(configuratorClasses);
+        Set<Class<? extends ProxyConfigurator>> proxyConfiguratorClasses = scanner.getSubTypesOf(ProxyConfigurator.class);
+        initConfigurators(configuratorClasses, proxyConfiguratorClasses);
     }
 
     @SneakyThrows
-    private void initConfigurators(Set<Class<? extends ObjectConfigurator>> configuratorClasses) {
+    private void initConfigurators(Set<Class<? extends ObjectConfigurator>> configuratorClasses,
+                                   Set<Class<? extends ProxyConfigurator>> proxyConfiguratorClasses) {
         for (Class<? extends ObjectConfigurator> configurator : configuratorClasses) {
-            configurators.add(configurator.getDeclaredConstructor().newInstance());
+            objectConfigurators.add(configurator.getDeclaredConstructor().newInstance());
+        }
+        for (Class<? extends ProxyConfigurator> configurator : proxyConfiguratorClasses) {
+            proxyConfigurators.add(configurator.getDeclaredConstructor().newInstance());
         }
     }
 
@@ -58,6 +66,14 @@ public class ObjectFactory {
         T object = create(type);
         configure(object);
         invokeInitMethod(object);
+        object = wrapWithProxy(type, object);
+        return object;
+    }
+
+    private <T> T wrapWithProxy(Class<T> type, T object) {
+        for (ProxyConfigurator proxyConfigurator : proxyConfigurators) {
+            object = (T) proxyConfigurator.wrapWithProxy(object, type);
+        }
         return object;
     }
 
@@ -76,12 +92,23 @@ public class ObjectFactory {
     }
 
     private <T> void configure(T object) {
-        configurators.forEach(configurator -> configurator.configure(object));
+        objectConfigurators.forEach(configurator -> configurator.configure(object));
     }
 
     private <T> Class<T> getImplementation(Class<T> type) {
         if (type.isInterface()) {
-            type = config.getImplementation(type);
+            Class<T> implementedClass = config.getImplementation(type);
+            if (implementedClass == null) {
+                Set<Class<? extends T>> classes = scanner.getSubTypesOf(type);
+                if (classes.size() != 1) {
+                    throw new ImplementationException(
+                            "0 or more than one implementation of the type" + type.getSimpleName() +
+                            " was found, please update your configuration");
+                }
+                type = (Class<T>) classes.iterator().next();
+            } else {
+                type = implementedClass;
+            }
         }
         return type;
     }

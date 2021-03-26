@@ -1,8 +1,9 @@
-package org.zeger.customspring.factory.config;
+package org.zeger.customspring.factory.config.object;
 
 import lombok.SneakyThrows;
 import org.reflections.ReflectionUtils;
 import org.zeger.customspring.factory.annotation.InjectRandomInt;
+import org.zeger.customspring.factory.config.object.ObjectConfigurator;
 import org.zeger.customspring.factory.util.RandomUtil;
 
 import java.lang.reflect.Field;

@@ -1,4 +1,4 @@
-package org.zeger.customspring.factory.config;
+package org.zeger.customspring.factory.config.object;
 
 import lombok.SneakyThrows;
 import org.reflections.ReflectionUtils;
@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
  * @implNote java-developer-course
  * @since 26/03/2021
  */
-public class InjectByTypeAnnotationConfigurator implements ObjectConfigurator {
+public class InjectByTypeAnnotationObjectConfigurator implements ObjectConfigurator {
 
     @Override
     @SneakyThrows
