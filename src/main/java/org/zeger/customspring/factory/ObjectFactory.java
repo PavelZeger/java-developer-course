@@ -1,14 +1,18 @@
 package org.zeger.customspring.factory;
 
 import lombok.SneakyThrows;
+import org.reflections.ReflectionUtils;
 import org.reflections.Reflections;
 import org.zeger.customspring.factory.config.Config;
 import org.zeger.customspring.factory.config.JavaConfig;
 import org.zeger.customspring.factory.config.ObjectConfigurator;
 
+import javax.annotation.PostConstruct;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author Pavel Zeger
@@ -51,9 +55,24 @@ public class ObjectFactory {
     @SneakyThrows
     public <T> T createObject(Class<T> type) {
         type = getImplementation(type);
-        T object = type.getDeclaredConstructor().newInstance();
+        T object = create(type);
         configure(object);
+        invokeInitMethod(object);
         return object;
+    }
+
+    @SneakyThrows
+    private <T> void invokeInitMethod(T object) {
+        Set<Method> annotatedMethods = ReflectionUtils.getAllMethods(object.getClass(), method -> method.isAnnotationPresent(PostConstruct.class))
+                .stream().collect(Collectors.toUnmodifiableSet());
+        for (Method method : annotatedMethods) {
+            method.invoke(object);
+        }
+    }
+
+    @SneakyThrows
+    private <T> T create(Class<T> type) {
+        return type.getDeclaredConstructor().newInstance();
     }
 
     private <T> void configure(T object) {
