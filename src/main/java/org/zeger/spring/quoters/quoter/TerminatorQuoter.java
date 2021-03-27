@@ -2,6 +2,7 @@ package org.zeger.spring.quoters.quoter;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.zeger.spring.quoters.annotation.Book;
+import org.zeger.spring.quoters.annotation.DeprecatedClass;
 import org.zeger.spring.quoters.annotation.Film;
 
 import javax.annotation.PreDestroy;
@@ -16,6 +17,7 @@ import java.util.List;
  */
 @Book
 @Film
+@DeprecatedClass(newClass = T1000.class)
 public class TerminatorQuoter implements Quoter {
 
     private List<String> messages;
