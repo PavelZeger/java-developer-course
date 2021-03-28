@@ -1,4 +1,4 @@
-package org.zeger.spring.qualifier.config;
+package org.zeger.spring.qualifier;
 
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.ComponentScan;

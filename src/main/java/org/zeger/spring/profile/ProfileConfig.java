@@ -1,4 +1,4 @@
-package org.zeger.spring.profile.config;
+package org.zeger.spring.profile;
 
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
