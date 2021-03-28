@@ -1,8 +1,6 @@
 package org.zeger.spring.aop;
 
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.*;
 
 /**
  * @author Pavel Zeger
@@ -11,10 +9,14 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @ComponentScan
+@PropertySource("classpath:application.properties")
+@EnableAspectJAutoProxy
 public class AopConfig {
 
     public static void main(String[] args) {
-        new AnnotationConfigApplicationContext(AopConfig.class);
+        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(AopConfig.class);
+        AppService appService = context.getBean(AppService.class);
+        appService.execute();
     }
 
 }
