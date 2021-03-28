@@ -26,4 +26,9 @@ public class Robot implements TalkingRobot {
         quoters.forEach(Quoter::sayQuote);
     }
 
+    @Override
+    public void setQuoters(List quoters) {
+
+    }
+
 }

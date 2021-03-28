@@ -37,4 +37,7 @@ public class TerminatorQuoter implements Quoter {
     public void killAll(){
         new Thread(() -> System.out.println("You are terminated")).start();
     }
+
+    public void setMessage(List message) {
+    }
 }
