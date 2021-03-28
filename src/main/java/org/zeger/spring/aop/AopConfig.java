@@ -2,6 +2,8 @@ package org.zeger.spring.aop;
 
 import org.springframework.context.annotation.*;
 
+import java.util.function.Function;
+
 /**
  * @author Pavel Zeger
  * @implNote java-developer-course
